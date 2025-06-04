@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -7,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>my test room 2</title>
   <style>
+    /* 既存のスタイルはそのまま */
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
@@ -125,6 +124,7 @@
     <h3>教科を選んでクイズ開始</h3>
     <button onclick="showSubjectQuiz()">教科別クイズ開始</button>
     <div id="subject-buttons"></div>
+    <button id="toggle-timer" onclick="toggleTimerMode()">時間制限モード: オフ</button>
   </div>
 
   <!-- クイズエリア -->
@@ -135,6 +135,7 @@
     <button onclick="checkAnswer()">答え合わせ</button>
     <p id="quiz-result"></p>
     <button id="next-question-button" onclick="nextQuestion()">次の問題へ</button>
+    <p id="timer"></p>
   </div>
 
   <div class="menu">
@@ -146,6 +147,9 @@
     let quizData = [];
     let currentIndex = 0;
     let correctAnswers = 0;
+    let timer;
+    let timeLeft = 30; // 各問題の制限時間（秒）
+    let isTimerEnabled = false; // 時間制限が有効かどうかのフラグ
 
     // 教科選択ボタンを表示
     function displaySubjectButtons() {
@@ -167,7 +171,16 @@
       quizData = JSON.parse(localStorage.getItem("quiz_" + currentSubject)) || [];
       currentIndex = 0;
       correctAnswers = 0;
+      shuffleQuestions(); // シャッフルを呼び出し
       showQuestion();
+    }
+
+    // 質問をシャッフル
+    function shuffleQuestions() {
+      for (let i = quizData.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [quizData[i], quizData[j]] = [quizData[j], quizData[i]]; // 配列の要素を交換
+      }
     }
 
     // 問題を表示
@@ -184,6 +197,12 @@
       const currentQuestion = quizData[currentIndex];
       document.getElementById("quiz-question").textContent = currentQuestion.question;
       document.getElementById("next-question-button").style.display = "none"; // 次の問題ボタン非表示
+      if (isTimerEnabled) {
+        document.getElementById("timer").textContent = `残り時間: ${timeLeft}秒`; // 時間表示
+        startTimer(); // タイマー開始
+      } else {
+        document.getElementById("timer").style.display = "none"; // 時間表示を非表示
+      }
     }
 
     // エンターキーで答え合わせを実行
@@ -193,8 +212,23 @@
       }
     }
 
+    // タイマー開始
+    function startTimer() {
+      clearInterval(timer);
+      timeLeft = 30; // タイマーを30秒にリセット
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          document.getElementById("timer").textContent = `残り時間: ${timeLeft}秒`;
+        } else {
+          checkAnswer(); // 時間が切れたら自動で答え合わせ
+        }
+      }, 1000);
+    }
+
     // 答え合わせ
     function checkAnswer() {
+      clearInterval(timer); // タイマー停止
       const userAnswer = document.getElementById("user-answer").value.trim();
       const correctAnswer = quizData[currentIndex].answer;
       if (userAnswer === correctAnswer) {
@@ -211,6 +245,18 @@
       currentIndex++;
       showQuestion();
       document.getElementById("user-answer").value = "";
+    }
+
+    // 時間制限モードを切り替える
+    function toggleTimerMode() {
+      isTimerEnabled = !isTimerEnabled;
+      document.getElementById("toggle-timer").textContent = isTimerEnabled ? "時間制限モード: オン" : "時間制限モード: オフ";
+      if (!isTimerEnabled) {
+        clearInterval(timer); // 時間制限オフの場合はタイマーを停止
+        document.getElementById("timer").style.display = "none";
+      } else {
+        document.getElementById("timer").style.display = "block";
+      }
     }
 
     // ページ読み込み時に作成した教科を表示
