@@ -68,20 +68,20 @@
   <h1>問題作成画面</h1>
 
   <div class="input-area">
-    <h3>背景色を選択</h3>
+    <h3>背景色変更</h3>
     <input type="color" id="bg-color-picker" />
   </div>
 
   <div class="input-area">
     <h3>新しい教科を作成</h3>
-    <input type="text" id="subject" placeholder="教科名 (例: 英語)" />
+    <input type="text" id="subject" placeholder="ここに教科を入力" />
     <button onclick="createSubject()">教科を作成</button>
   </div>
 
   <div class="input-area">
     <h3>問題を入力</h3>
-    <input type="text" id="category" placeholder="カテゴリー名 (例: 英単語)" />
-    <textarea id="quiz-input" placeholder="問題=答え の形式で1行ずつ入力（複数正解： 保守性,安全性,保全性）"></textarea>
+    <input type="text" id="category" placeholder="ここに教科を入力" />
+    <textarea id="quiz-input" placeholder="問題=答え の形式で1行ずつ入力（複数正解： 林檎、胡瓜、梨）"></textarea>
     <button onclick="addQuestion()">問題を追加</button>
   </div>
 
@@ -96,7 +96,7 @@
   </div>
 
   <div class="menu">
-    <button onclick="window.location.href='問題実行.html'">クイズを始める</button>
+    <button onclick="window.location.href='問題実行.html'">問題を実行</button>
   </div>
 
   <script>
@@ -132,7 +132,7 @@
       const input = document.getElementById("quiz-input").value.trim();
       const category = document.getElementById("category").value.trim();
       if (!input || !category) {
-        alert("カテゴリーと問題を入力してください！");
+        alert("教科と問題を入力してください！");
         return;
       }
 
