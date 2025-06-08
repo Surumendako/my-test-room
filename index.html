@@ -114,7 +114,7 @@
   <div class="input-area">
     <h3>問題を入力</h3>
     <input type="text" id="category" placeholder="カテゴリー名" />
-    <textarea id="quiz-input" placeholder="問題=答え&#10;記述問題は[desc]キーワードに,&#10;複数問題は答えに、"></textarea>
+    <textarea id="quiz-input" placeholder="(基本)問題=答え&#10;(記述)[desc]問題=答え,&#10(複数)問題=答え、答え、答え"></textarea>
     <button onclick="addQuestion()">問題を追加</button>
   </div>
 
@@ -146,13 +146,13 @@
     function createSubject() {
       const subject = document.getElementById("subject").value.trim();
       if (!subject) {
-        alert("教科名を入力してください！");
+        alert("NO 教科");
         return;
       }
       currentSubject = subject;
       quizData = JSON.parse(localStorage.getItem("quiz_" + currentSubject)) || [];
       localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
-      alert(`「${subject}」の教科を作成しました！`);
+      alert(`教科「${subject}」を作成しました`);
       displaySubjectList();
       displayQuestionList();
       document.getElementById("subject").value = "";
@@ -160,13 +160,13 @@
 
     function addQuestion() {
       if (!currentSubject) {
-        alert("教科を作成してください！");
+        alert("教科が作成されていません");
         return;
       }
       const input = document.getElementById("quiz-input").value.trim();
       const category = document.getElementById("category").value.trim();
       if (!input || !category) {
-        alert("カテゴリーと問題を入力してください！");
+        alert("教科と問題が作成されていません");
         return;
       }
 
@@ -196,7 +196,7 @@
       });
 
       localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
-      alert("問題が追加されました！");
+      alert("問題を作成しました");
       displayQuestionList();
       document.getElementById("quiz-input").value = "";
       document.getElementById("category").value = "";
