@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>my test room 2</title>
+  <title>My test room 2</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -185,13 +184,13 @@
       }, 1000);
     }
 
-    // 複数の正解キーワードすべてを含むかチェックする補助関数
+  
     function includesAllKeywords(answer, userAnswer) {
-      // answerは配列、userAnswerは文字列
+  
       return answer.every(keyword => userAnswer.includes(keyword));
     }
 
-    // 配列の正解を標準化する関数
+  
     function normalizeAnswer(answer) {
       if (Array.isArray(answer)) {
         return answer.map(a => a.trim()).sort();
@@ -211,13 +210,13 @@
       let isCorrect = false;
 
       if (current.isDescriptive) {
-        // 記述問題の場合は正解キーワードを全部含むかを判定（部分一致判定）
+     
         const keywords = normalizeAnswer(current.answer).map(k => k.toLowerCase());
         isCorrect = includesAllKeywords(keywords, userAnswer);
       } else {
-        // 通常問題は単純一致（大文字小文字は無視）
+     
         if (Array.isArray(current.answer)) {
-          // 複数正解の中にユーザー解答が含まれるか
+        
           const normalizedAnswers = normalizeAnswer(current.answer).map(a => a.toLowerCase());
           isCorrect = normalizedAnswers.includes(userAnswer);
         } else {
