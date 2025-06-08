@@ -179,14 +179,13 @@
           let rawAnswer = parts[1].trim();
           let answer;
           
-          // [desc]タグ判定
+
           let isDesc = false;
           if (question.startsWith("[desc]")) {
             isDesc = true;
             question = question.replace("[desc]", "").trim();
           }
 
-          // 複数正解・キーワードはカンマ区切りに統一
           if (rawAnswer.includes(",")) {
             answer = rawAnswer.split(",").map(a => a.trim()).sort();
           } else {
