@@ -86,15 +86,7 @@
       max-width: 85%;
       word-break: break-word;
     }
-    .tag-desc {
-      background-color: #ffecb3;
-      color: #a67c00;
-      border-radius: 3px;
-      padding: 2px 6px;
-      font-size: 12px;
-      margin-left: 8px;
-      font-weight: bold;
-    }
+    /* 記述問題タグはもう不要なので削除 */
   </style>
 </head>
 <body>
@@ -114,7 +106,7 @@
   <div class="input-area">
     <h3>問題を入力</h3>
     <input type="text" id="category" placeholder="カテゴリー名" />
-    <textarea id="quiz-input" placeholder="(基本)問題=答え&#10;(記述)[desc]問題=答え,&#10(複数)問題=答え、答え、答え"></textarea>
+    <textarea id="quiz-input" placeholder="(基本)問題=答え&#10;(複数)問題=答え、答え、答え"></textarea>
     <button onclick="addQuestion()">問題を追加</button>
   </div>
 
@@ -177,21 +169,17 @@
           let question = parts[0].trim();
           let rawAnswer = parts[1].trim();
           let answer;
-          
 
-          let isDesc = false;
-          if (question.startsWith("[desc]")) {
-            isDesc = true;
-            question = question.replace("[desc]", "").trim();
-          }
+          // [desc]判定を完全削除
 
-          if (rawAnswer.includes(",")) {
-            answer = rawAnswer.split(",").map(a => a.trim()).sort();
+          // 複数答えはカンマ（,）または全角カンマ（、）で分割し、ソートして配列に
+          if (rawAnswer.includes(",") || rawAnswer.includes("、")) {
+            answer = rawAnswer.split(/,|、/).map(a => a.trim()).sort();
           } else {
             answer = rawAnswer;
           }
 
-          quizData.push({ question, answer, category, isDesc });
+          quizData.push({ question, answer, category });
         }
       });
 
@@ -221,10 +209,10 @@
       list.innerHTML = "<h4>現在の問題リスト:</h4>";
       quizData.forEach((q, i) => {
         const answerText = Array.isArray(q.answer) ? q.answer.join(", ") : q.answer;
-        const descTag = q.isDesc ? `<span class="tag-desc">記述問題</span>` : "";
+        // 記述問題タグは不要なので表示しない
         const item = document.createElement("div");
         item.classList.add("question-item");
-        item.innerHTML = `<p><strong>${q.category}:</strong> ${q.question} = ${answerText} ${descTag}</p>
+        item.innerHTML = `<p><strong>${q.category}:</strong> ${q.question} = ${answerText}</p>
           <button onclick="deleteQuestion(${i})">削除</button>`;
         list.appendChild(item);
       });
