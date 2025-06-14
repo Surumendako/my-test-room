@@ -90,7 +90,7 @@
   <div class="quiz-area" id="quiz-area" style="display: none;">
     <h2>問題</h2>
     <p id="quiz-question"></p>
-    <input type="text" id="user-answer" placeholder="答えを入力" onkeydown="handleKeyDown(event)">
+    <input type="text" id="user-answer" placeholder="答えを「、」で区切って複数入力可能" onkeydown="handleKeyDown(event)">
     <button onclick="checkAnswer()">答え合わせ</button>
     <p id="quiz-result"></p>
     <button id="next-question-button" onclick="nextQuestion()">次の問題へ</button>
@@ -172,60 +172,38 @@
       if (event.key === "Enter") checkAnswer();
     }
 
-    function startTimer() {
-      clearInterval(timer);
-      timer = setInterval(() => {
-        if (timeLeft > 0) {
-          timeLeft--;
-          document.getElementById("timer").textContent = `残り時間: ${timeLeft}秒`;
-        } else {
-          checkAnswer();
-        }
-      }, 1000);
-    }
-
-  
-    function includesAllKeywords(answer, userAnswer) {
-  
-      return answer.every(keyword => userAnswer.includes(keyword));
-    }
-
-  
-    function normalizeAnswer(answer) {
-      if (Array.isArray(answer)) {
-        return answer.map(a => a.trim()).sort();
-      } else if (typeof answer === "string") {
-        return [answer.trim()];
-      } else {
-        return [];
-      }
+    function normalizeArray(arr) {
+      return arr.map(a => a.trim().toLowerCase()).filter(a => a !== "").sort();
     }
 
     function checkAnswer() {
       clearInterval(timer);
       const userAnswerRaw = document.getElementById("user-answer").value.trim();
-      const userAnswer = userAnswerRaw.toLowerCase();
       const current = quizData[currentIndex];
+
+      if (!userAnswerRaw) {
+        document.getElementById("quiz-result").textContent = "答えを入力してください。";
+        return;
+      }
+
+      
+      const userAnswers = normalizeArray(userAnswerRaw.split("、"));
 
       let isCorrect = false;
 
-      if (current.isDescriptive) {
-     
-        const keywords = normalizeAnswer(current.answer).map(k => k.toLowerCase());
-        isCorrect = includesAllKeywords(keywords, userAnswer);
-      } else {
-     
-        if (Array.isArray(current.answer)) {
+      if (Array.isArray(current.answer)) {
         
-          const normalizedAnswers = normalizeAnswer(current.answer).map(a => a.toLowerCase());
-          isCorrect = normalizedAnswers.includes(userAnswer);
-        } else {
-          isCorrect = current.answer.trim().toLowerCase() === userAnswer;
-        }
+        const correctAnswers = normalizeArray(current.answer);
+
+        
+        isCorrect = userAnswers.every(ans => correctAnswers.includes(ans)) && userAnswers.length > 0;
+      } else {
+
+        isCorrect = current.answer.trim().toLowerCase() === userAnswers[0];
       }
 
       if (isCorrect) {
-        document.getElementById("quiz-result").textContent = current.isDescriptive ? "部分一致で正解判定！" : "正解！";
+        document.getElementById("quiz-result").textContent = "正解！";
         correctAnswers++;
       } else {
         const showAnswer = Array.isArray(current.answer)
@@ -240,6 +218,18 @@
     function nextQuestion() {
       currentIndex++;
       showQuestion();
+    }
+
+    function startTimer() {
+      clearInterval(timer);
+      timer = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          document.getElementById("timer").textContent = `残り時間: ${timeLeft}秒`;
+        } else {
+          checkAnswer();
+        }
+      }, 1000);
     }
 
     function toggleTimerMode() {
