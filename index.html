@@ -10,199 +10,197 @@
       margin: 0;
       padding: 0 10px 40px 10px;
       color: #333;
-      background: linear-gradient(-45deg, #a2cfff, #ffffff, #d0eaff, #ffffff);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      background: linear-gradient(to bottom right, #f0f8ff, #e0ffff);
     }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     h1, h3 {
       text-align: center;
-      color: #000;
       margin-bottom: 20px;
     }
-
     .input-area {
       margin-bottom: 20px;
       text-align: center;
     }
-
-    input, textarea {
+    input, textarea, select {
       padding: 12px;
       width: 90%;
       margin: 5px auto;
       font-size: 16px;
+      box-sizing: border-box;
       border-radius: 6px;
       border: 1.5px solid #bbb;
     }
-
     button {
-      padding: 12px 30px;
+      padding: 10px 20px;
+      margin: 5px;
       font-size: 16px;
-      cursor: pointer;
-      margin-top: 10px;
       border: none;
       border-radius: 6px;
+      cursor: pointer;
       background-color: #5cb85c;
       color: white;
-      min-width: 140px;
     }
-
-    .menu {
-      text-align: center;
-      margin-top: 30px;
+    button:hover {
+      background-color: #4cae4c;
     }
-
     .menu button {
       background-color: #0275d8;
     }
-
+    .menu button:hover {
+      background-color: #025aa5;
+    }
     .subject-list, .question-list {
-      text-align: left;
-      margin: 20px auto;
       width: 90%;
-      background-color: rgba(255, 255, 255, 0.95);
+      margin: 0 auto 20px;
+      background-color: rgba(255,255,255,0.95);
       padding: 15px 20px;
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
-
     .subject-item, .question-item {
-      margin: 10px 0;
-      padding: 6px 10px;
-      border-bottom: 1px solid #ddd;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 15px;
+      padding: 6px 0;
+      border-bottom: 1px solid #ddd;
     }
-
-    .question-item p {
-      margin: 0;
-      max-width: 85%;
-      word-break: break-word;
+    .question-item textarea {
+      width: 100%;
+      font-size: 15px;
+      margin-top: 5px;
+    }
+    #message {
+      text-align: center;
+      color: green;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>問題作成画面</h1>
+  <h1>My Test Room 1（作問画面）</h1>
 
   <div class="input-area">
-    <h3>新しい教科を作成</h3>
-    <input type="text" id="subject" placeholder="教科名" />
-    <button onclick="createSubject()">教科を作成</button>
+    <h3>教科を選択／作成</h3>
+    <input type="text" id="subject" placeholder="新しい教科名">
+    <button onclick="createSubject()">作成</button><br>
+    <select id="subject-selector" onchange="selectSubject()">
+      <option value="">教科を選択</option>
+    </select>
   </div>
 
   <div class="input-area">
-    <h3>問題を入力</h3>
-    <input type="text" id="category" placeholder="カテゴリー名" />
-    <textarea id="quiz-input" placeholder="問題=答え、答え、答え"></textarea>
+    <h3>問題を入力（複数行OK）</h3>
+    <input type="text" id="category" placeholder="カテゴリー名">
+    <textarea id="quiz-input" rows="4" placeholder="問題=答え、答え\n例: 首都=東京、大阪"></textarea>
     <button onclick="addQuestion()">問題を追加</button>
-  </div>
-
-  <div class="subject-list">
-    <h3>作成された教科</h3>
-    <div id="subject-list-container"></div>
   </div>
 
   <div class="question-list">
     <h3>問題リスト</h3>
     <div id="question-list-container"></div>
+    <button onclick="copyAllQuestions()">全てコピー</button>
   </div>
 
   <div class="menu">
     <button onclick="window.location.href='問題実行.html'">クイズを始める</button>
   </div>
 
+  <div id="message"></div>
+
   <script>
     let currentSubject = "";
     let quizData = [];
 
+    function setMessage(text) {
+      const msg = document.getElementById("message");
+      msg.textContent = text;
+      setTimeout(() => msg.textContent = "", 2000);
+    }
+
     function createSubject() {
       const subject = document.getElementById("subject").value.trim();
-      if (!subject) {
-        alert("教科名を入力してください");
-        return;
-      }
+      if (!subject) return alert("教科名を入力してね");
       currentSubject = subject;
-      quizData = JSON.parse(localStorage.getItem("quiz_" + currentSubject)) || [];
-      localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
-      displaySubjectList();
-      displayQuestionList();
+      quizData = [];
+      localStorage.setItem("quiz_" + subject, JSON.stringify([]));
+      updateSubjectSelector();
+      setMessage(`教科「${subject}」を作成`);
       document.getElementById("subject").value = "";
     }
 
+    function updateSubjectSelector() {
+      const selector = document.getElementById("subject-selector");
+      selector.innerHTML = '<option value="">教科を選択</option>';
+      const subjects = Object.keys(localStorage).filter(k => k.startsWith("quiz_"));
+      subjects.forEach(key => {
+        const name = key.replace("quiz_", "");
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        if (name === currentSubject) option.selected = true;
+        selector.appendChild(option);
+      });
+    }
+
+    function selectSubject() {
+      currentSubject = document.getElementById("subject-selector").value;
+      if (!currentSubject) return;
+      quizData = JSON.parse(localStorage.getItem("quiz_" + currentSubject)) || [];
+      displayQuestionList();
+    }
+
     function addQuestion() {
-      if (!currentSubject) {
-        alert("教科が作成されていません");
-        return;
-      }
+      if (!currentSubject) return alert("教科を選択してください");
       const input = document.getElementById("quiz-input").value.trim();
       const category = document.getElementById("category").value.trim();
-      if (!input || !category) {
-        alert("カテゴリー名と問題を入力してください");
-        return;
-      }
+      if (!input || !category) return alert("カテゴリーと問題を入力してね");
 
-      const lines = input.split("\n");
-      lines.forEach(line => {
-        const parts = line.split("=");
-        if (parts.length === 2) {
-          const question = parts[0].trim();
-          const rawAnswer = parts[1].trim();
-          const answer = rawAnswer.includes("、")
-            ? rawAnswer.split("、").map(a => a.trim())
-            : rawAnswer;
-          quizData.push({ question, answer, category });
-        }
+      input.split("\n").forEach(line => {
+        const [question, answerRaw] = line.split("=");
+        if (!question || !answerRaw) return;
+        const answers = answerRaw.includes("、")
+          ? answerRaw.split("、").map(a => a.trim())
+          : answerRaw.trim();
+        quizData.push({ question: question.trim(), answer: answers, category });
       });
 
       localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
       displayQuestionList();
+      setMessage("問題を追加しました");
       document.getElementById("quiz-input").value = "";
       document.getElementById("category").value = "";
-    }
-
-    function displaySubjectList() {
-      const subjectListDiv = document.getElementById("subject-list-container");
-      const savedSubjects = Object.keys(localStorage).filter(key => key.startsWith("quiz_"));
-      subjectListDiv.innerHTML = "";
-      savedSubjects.forEach(subjectKey => {
-        const subjectName = subjectKey.replace("quiz_", "");
-        const item = document.createElement("div");
-        item.classList.add("subject-item");
-        item.innerHTML = `<span>${subjectName}</span>
-          <button onclick="deleteSubject('${subjectName}')">削除</button>`;
-        subjectListDiv.appendChild(item);
-      });
     }
 
     function displayQuestionList() {
       const list = document.getElementById("question-list-container");
       list.innerHTML = "";
       quizData.forEach((q, i) => {
-        const answerText = Array.isArray(q.answer) ? q.answer.join("、") : q.answer;
+        const ans = Array.isArray(q.answer) ? q.answer.join("、") : q.answer;
         const item = document.createElement("div");
-        item.classList.add("question-item");
-        item.innerHTML = `<p><strong>${q.category}:</strong> ${q.question} = ${answerText}</p>
-          <button onclick="deleteQuestion(${i})">削除</button>`;
+        item.className = "question-item";
+        item.innerHTML = `
+          <div>
+            <strong>${q.category}:</strong> ${q.question} = ${ans}
+          </div>
+          <div>
+            <button onclick="editQuestion(${i})">編集</button>
+            <button onclick="deleteQuestion(${i})">削除</button>
+          </div>`;
         list.appendChild(item);
       });
     }
 
-    function deleteSubject(name) {
-      localStorage.removeItem("quiz_" + name);
-      if (name === currentSubject) {
-        currentSubject = "";
-        quizData = [];
-        document.getElementById("question-list-container").innerHTML = "";
-      }
-      displaySubjectList();
+    function editQuestion(index) {
+      const q = quizData[index];
+      const newText = prompt("編集内容を入力（形式: 問題=答え、答え）", `${q.question}=${Array.isArray(q.answer) ? q.answer.join("、") : q.answer}`);
+      if (!newText) return;
+      const [newQ, newA] = newText.split("=");
+      if (!newQ || !newA) return alert("形式が正しくありません");
+      quizData[index].question = newQ.trim();
+      quizData[index].answer = newA.includes("、")
+        ? newA.split("、").map(a => a.trim())
+        : newA.trim();
+      localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
+      displayQuestionList();
     }
 
     function deleteQuestion(index) {
@@ -211,8 +209,16 @@
       displayQuestionList();
     }
 
+    function copyAllQuestions() {
+      const all = quizData.map(q => `${q.question}=${Array.isArray(q.answer) ? q.answer.join("、") : q.answer}`).join("\n");
+      navigator.clipboard.writeText(all).then(() => {
+        setMessage("問題をコピーしました！");
+      });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
-      displaySubjectList();
+      updateSubjectSelector();
+      if (currentSubject) selectSubject();
     });
   </script>
 </body>
