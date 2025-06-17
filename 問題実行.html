@@ -2,173 +2,303 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My Test Room 2</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 20px 10px 40px 10px;
       color: #333;
-      background: linear-gradient(-45deg, #d1ffd1, #ffffff, #e6ffe6, #ffffff);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
+      background-color: #f9fdfc;
+      background-image: linear-gradient(135deg, #e0f7fa 0%, #80deea 100%);
+      min-height: 100vh;
+      user-select: none;
     }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    h1, h3 {
+    h1 {
       text-align: center;
-      margin: 20px 0;
+      color: #004d40;
+      margin-bottom: 30px;
     }
-
-    .quiz-area {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: rgba(255,255,255,0.95);
-      padding: 20px;
-      border-radius: 8px;
+    #subject-buttons {
+      text-align: center;
+      margin-bottom: 25px;
     }
-
-    input {
-      width: 100%;
-      height: 50px;
-      font-size: 20px;
-      margin-top: 10px;
-      padding: 10px;
-    }
-
-    button {
-      padding: 10px 20px;
+    #subject-buttons button {
+      margin: 5px 10px;
+      padding: 10px 18px;
       font-size: 16px;
-      margin: 5px;
       cursor: pointer;
       border: none;
-      border-radius: 6px;
-      background-color: #5cb85c;
+      border-radius: 8px;
+      background-color: #00796b;
       color: white;
+      transition: background-color 0.3s ease;
+      min-width: 130px;
     }
-
-    button:hover {
-      background-color: #4cae4c;
+    #subject-buttons button:hover {
+      background-color: #004d40;
     }
-
+    .quiz-area {
+      max-width: 600px;
+      margin: 0 auto 40px;
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      user-select: text;
+    }
+    #quiz-question {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      min-height: 60px;
+      word-break: break-word;
+    }
+    #user-answer {
+      width: 100%;
+      height: 48px;
+      font-size: 20px;
+      border: 2px solid #00796b;
+      border-radius: 8px;
+      padding: 6px 10px;
+      box-sizing: border-box;
+      margin-top: 6px;
+      outline-offset: 2px;
+      transition: outline-color 0.3s ease;
+    }
+    #user-answer:focus {
+      outline: 3px solid #004d40;
+    }
+    #quiz-result {
+      font-size: 18px;
+      margin-top: 16px;
+      font-weight: bold;
+      min-height: 30px;
+      user-select: text;
+      color: #004d40;
+    }
+    #next-question-button {
+      display: none;
+      margin-top: 25px;
+      min-width: 140px;
+      padding: 10px 18px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #00796b;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    #next-question-button:hover {
+      background-color: #004d40;
+    }
+    #timer {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #004d40;
+      user-select: none;
+      min-height: 24px;
+      text-align: right;
+    }
     .menu {
       text-align: center;
       margin-top: 30px;
     }
-
     .menu button {
-      background-color: #0275d8;
+      background-color: #004d40;
+      min-width: 180px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    .menu button:hover {
+      background-color: #00251a;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding: 15px 10px 30px 10px;
+      }
+      .quiz-area {
+        width: 95%;
+        padding: 20px 20px;
+      }
+      #subject-buttons button,
+      #next-question-button,
+      .menu button,
+      #user-answer {
+        width: 100%;
+        font-size: 18px;
+        margin: 8px 0;
+        min-width: auto;
+      }
+      #timer {
+        text-align: center;
+      }
+      #next-question-button {
+        margin-top: 15px;
+      }
     }
   </style>
 </head>
 <body>
   <h1>My Test Room 2</h1>
 
-  <div class="quiz-area" id="quiz-area" style="display:none;">
+  <div id="subject-buttons">
+    <!-- 教科ボタンをここに動的追加 -->
+  </div>
+
+  <div class="quiz-area" id="quiz-area" style="display: none;">
     <h2>問題</h2>
     <p id="quiz-question"></p>
-    <input type="text" id="user-answer" onkeydown="handleKeyDown(event)">
-    <button onclick="checkAnswer()">答え合わせ</button>
-    <p id="quiz-result"></p>
-    <button id="next-question-button" onclick="nextQuestion()" style="display:none;">次の問題へ</button>
-    <p id="timer" style="display:none;"></p>
+    <input type="text" id="user-answer" placeholder="答えを入力してください" onkeydown="handleKeyDown(event)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <button id="check-answer-button" onclick="checkAnswer()">答え合わせ</button>
+    <p id="quiz-result" aria-live="polite"></p>
+    <button id="next-question-button" onclick="nextQuestion()">次の問題へ</button>
+    <p id="timer"></p>
   </div>
 
   <div class="menu">
-    <h3>教科を選んで開始</h3>
-    <button onclick="displaySubjectButtons()">教科一覧を表示</button>
-    <div id="subject-buttons"></div>
-    <button id="toggle-timer" onclick="toggleTimerMode()">時間制限モード: オフ</button>
-    <br><br>
-    <button onclick="window.location.href='index.html'">作成画面に戻る</button>
+    <button onclick="location.href='index.html'">クイズ作成画面に戻る</button>
   </div>
 
   <script>
     let currentSubject = "";
     let quizData = [];
     let currentIndex = 0;
-    let correctAnswers = 0;
+    let totalCorrect = 0;
     let timer;
     let timeLeft = 30;
     let isTimerEnabled = false;
 
     function displaySubjectButtons() {
-      const div = document.getElementById("subject-buttons");
-      div.innerHTML = "";
-      const subjects = Object.keys(localStorage).filter(k => k.startsWith("quiz_"));
-      subjects.forEach(k => {
-        const name = k.replace("quiz_", "");
+      const container = document.getElementById("subject-buttons");
+      container.innerHTML = "";
+
+      // localStorageのquiz_で始まるキーを取得
+      const keys = Object.keys(localStorage).filter(k => k.startsWith("quiz_"));
+      if(keys.length === 0) {
+        container.textContent = "教科のクイズデータがありません。";
+        return;
+      }
+
+      keys.forEach(key => {
+        const subject = key.replace("quiz_", "");
         const btn = document.createElement("button");
-        btn.textContent = name;
-        btn.onclick = () => loadQuiz(name);
-        div.appendChild(btn);
+        btn.textContent = subject;
+        btn.onclick = () => startQuiz(subject);
+        container.appendChild(btn);
       });
     }
 
-    function loadQuiz(name) {
-      currentSubject = name;
-      quizData = JSON.parse(localStorage.getItem("quiz_" + name)) || [];
+    function startQuiz(subject) {
+      currentSubject = subject;
+      quizData = JSON.parse(localStorage.getItem("quiz_" + subject)) || [];
+      if(quizData.length === 0) {
+        alert(`教科「${subject}」に問題がありません。`);
+        return;
+      }
+      shuffleQuestions();
       currentIndex = 0;
-      correctAnswers = 0;
-      shuffle(quizData);
+      totalCorrect = 0;
+      isTimerEnabled = false; // タイマー初期オフ
+      document.getElementById("quiz-area").style.display = "block";
+      document.getElementById("subject-buttons").style.display = "none";
       showQuestion();
     }
 
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
+    function shuffleQuestions() {
+      for(let i=quizData.length-1; i>0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+        [quizData[i], quizData[j]] = [quizData[j], quizData[i]];
       }
     }
 
     function showQuestion() {
-      if (currentIndex >= quizData.length) {
-        document.getElementById("quiz-question").textContent = `終了！ 正解数: ${correctAnswers} / ${quizData.length}`;
+      clearInterval(timer);
+      if(currentIndex >= quizData.length) {
+        document.getElementById("quiz-question").textContent = `クイズ終了！ 正解数: ${totalCorrect} / ${quizData.length}`;
         document.getElementById("quiz-result").textContent = "";
+        document.getElementById("quiz-area").style.display = "none";
+        alert(`お疲れ様でした！\n正解数は ${totalCorrect} / ${quizData.length} です。`);
+        // 初期状態に戻す
+        currentSubject = "";
+        quizData = [];
+        currentIndex = 0;
+        totalCorrect = 0;
+        document.getElementById("subject-buttons").style.display = "block";
         return;
       }
-      document.getElementById("quiz-area").style.display = "block";
-      document.getElementById("next-question-button").style.display = "none";
-      document.getElementById("quiz-result").textContent = "";
+
       document.getElementById("quiz-question").textContent = quizData[currentIndex].question;
       document.getElementById("user-answer").value = "";
-      if (isTimerEnabled) {
+      document.getElementById("user-answer").disabled = false;
+      document.getElementById("quiz-result").textContent = "";
+      document.getElementById("next-question-button").style.display = "none";
+      document.getElementById("check-answer-button").style.display = "inline-block";
+      document.getElementById("user-answer").focus();
+
+      if(isTimerEnabled) {
         timeLeft = 30;
-        document.getElementById("timer").style.display = "block";
-        document.getElementById("timer").textContent = `残り: ${timeLeft}秒`;
+        document.getElementById("timer").textContent = `残り時間: ${timeLeft}秒`;
         startTimer();
+        document.getElementById("timer").style.display = "block";
+      } else {
+        clearInterval(timer);
+        document.getElementById("timer").textContent = "";
+        document.getElementById("timer").style.display = "none";
       }
+    }
+
+    function handleKeyDown(e) {
+      if(e.key === "Enter") {
+        e.preventDefault();
+        checkAnswer();
+      }
+    }
+
+    function normalizeArray(arr) {
+      return arr.map(a => a.trim().toLowerCase()).filter(a => a !== "").sort();
     }
 
     function checkAnswer() {
       clearInterval(timer);
-      const input = document.getElementById("user-answer").value.trim();
+      const userAnswerRaw = document.getElementById("user-answer").value.trim();
+      if(!userAnswerRaw) {
+        document.getElementById("quiz-result").textContent = "答えを入力してください。";
+        return;
+      }
+
       const current = quizData[currentIndex];
-      let correct = false;
+      const userAnswers = normalizeArray(userAnswerRaw.split("、"));
 
-      if (Array.isArray(current.answer)) {
-        const expected = current.answer.map(a => a.trim().toLowerCase()).sort();
-        const user = input.split("、").map(a => a.trim().toLowerCase()).sort();
-        correct = JSON.stringify(expected) === JSON.stringify(user);
+      let isCorrect = false;
+      if(Array.isArray(current.answer)) {
+        const correctAnswers = normalizeArray(current.answer);
+        isCorrect = userAnswers.length === correctAnswers.length && userAnswers.every(ans => correctAnswers.includes(ans));
       } else {
-        correct = current.answer.trim().toLowerCase() === input.toLowerCase();
+        isCorrect = current.answer.trim().toLowerCase() === userAnswers[0];
       }
 
-      if (correct) {
+      if(isCorrect) {
         document.getElementById("quiz-result").textContent = "正解！";
-        correctAnswers++;
+        totalCorrect++;
       } else {
-        const showAns = Array.isArray(current.answer) ? current.answer.join("、") : current.answer;
-        document.getElementById("quiz-result").textContent = `不正解... 正解は「${showAns}」`;
+        const showAnswer = Array.isArray(current.answer) ? current.answer.join("、") : current.answer;
+        document.getElementById("quiz-result").textContent = `不正解... 正解は「${showAnswer}」`;
       }
 
-      document.getElementById("next-question-button").style.display = "inline";
+      document.getElementById("next-question-button").style.display = "inline-block";
+      document.getElementById("check-answer-button").style.display = "none";
+      document.getElementById("user-answer").disabled = true;
+      clearInterval(timer);
+      document.getElementById("timer").textContent = "";
     }
 
     function nextQuestion() {
@@ -176,33 +306,28 @@
       showQuestion();
     }
 
-    function handleKeyDown(e) {
-      if (e.key === "Enter") checkAnswer();
-    }
-
     function startTimer() {
       clearInterval(timer);
+      document.getElementById("user-answer").disabled = false;
       timer = setInterval(() => {
-        if (timeLeft > 0) {
+        if(timeLeft > 0) {
           timeLeft--;
-          document.getElementById("timer").textContent = `残り: ${timeLeft}秒`;
+          document.getElementById("timer").textContent = `残り時間: ${timeLeft}秒`;
         } else {
           clearInterval(timer);
-          checkAnswer();
+          document.getElementById("quiz-result").textContent = "時間切れ！不正解扱いです。";
+          document.getElementById("next-question-button").style.display = "inline-block";
+          document.getElementById("check-answer-button").style.display = "none";
+          document.getElementById("user-answer").disabled = true;
+          document.getElementById("timer").textContent = "";
         }
       }, 1000);
     }
 
-    function toggleTimerMode() {
-      isTimerEnabled = !isTimerEnabled;
-      document.getElementById("toggle-timer").textContent = isTimerEnabled ? "時間制限モード: オン" : "時間制限モード: オフ";
-      if (!isTimerEnabled) {
-        clearInterval(timer);
-        document.getElementById("timer").style.display = "none";
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", displaySubjectButtons);
+    // ページ読み込み時に教科ボタンを表示
+    window.onload = () => {
+      displaySubjectButtons();
+    };
   </script>
 </body>
 </html>
