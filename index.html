@@ -3,46 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My test room 1</title>
+  <title>My Test Room 1</title>
   <style>
-    
-    @keyframes gradientShift {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
     body {
-      background: linear-gradient(270deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
-      background-size: 800% 800%;
-      animation: gradientShift 20s ease infinite;
-      color: #333;
       font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0 10px 40px 10px;
+      color: #333;
+      background: linear-gradient(-45deg, #a2cfff, #ffffff, #d0eaff, #ffffff);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
     }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
     h1, h3 {
       text-align: center;
       color: #000;
       margin-bottom: 20px;
     }
+
     .input-area {
       margin-bottom: 20px;
       text-align: center;
     }
+
     input, textarea {
       padding: 12px;
       width: 90%;
       margin: 5px auto;
       font-size: 16px;
-      box-sizing: border-box;
       border-radius: 6px;
       border: 1.5px solid #bbb;
-      transition: border-color 0.3s ease;
     }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #5cb85c;
-    }
+
     button {
       padding: 12px 30px;
       font-size: 16px;
@@ -52,25 +50,18 @@
       border-radius: 6px;
       background-color: #5cb85c;
       color: white;
-      transition: background-color 0.3s ease;
-      display: inline-block;
       min-width: 140px;
     }
-    button:hover {
-      background-color: #4cae4c;
-    }
+
     .menu {
       text-align: center;
       margin-top: 30px;
     }
+
     .menu button {
       background-color: #0275d8;
-      color: white;
-      min-width: 160px;
     }
-    .menu button:hover {
-      background-color: #025aa5;
-    }
+
     .subject-list, .question-list {
       text-align: left;
       margin: 20px auto;
@@ -80,6 +71,7 @@
       border-radius: 10px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
+
     .subject-item, .question-item {
       margin: 10px 0;
       padding: 6px 10px;
@@ -89,6 +81,7 @@
       align-items: center;
       font-size: 15px;
     }
+
     .question-item p {
       margin: 0;
       max-width: 85%;
@@ -139,7 +132,6 @@
       currentSubject = subject;
       quizData = JSON.parse(localStorage.getItem("quiz_" + currentSubject)) || [];
       localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
-      alert(`教科「${subject}」を作成しました`);
       displaySubjectList();
       displayQuestionList();
       document.getElementById("subject").value = "";
@@ -163,20 +155,14 @@
         if (parts.length === 2) {
           const question = parts[0].trim();
           const rawAnswer = parts[1].trim();
-
-          let answer;
-          if (rawAnswer.includes("、")) {
-            answer = rawAnswer.split("、").map(a => a.trim());
-          } else {
-            answer = rawAnswer;
-          }
-
+          const answer = rawAnswer.includes("、")
+            ? rawAnswer.split("、").map(a => a.trim())
+            : rawAnswer;
           quizData.push({ question, answer, category });
         }
       });
 
       localStorage.setItem("quiz_" + currentSubject, JSON.stringify(quizData));
-      alert("問題を追加しました");
       displayQuestionList();
       document.getElementById("quiz-input").value = "";
       document.getElementById("category").value = "";
@@ -211,7 +197,6 @@
 
     function deleteSubject(name) {
       localStorage.removeItem("quiz_" + name);
-      alert(`教科「${name}」を削除しました`);
       if (name === currentSubject) {
         currentSubject = "";
         quizData = [];
