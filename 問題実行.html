@@ -39,3 +39,90 @@
       border-radius: 6px;
       transition: background-color 0.3s ease;
     }
+    button:hover {
+      background-color: #4cae4c;
+    }
+    #quiz-container {
+      text-align: center;
+      padding: 30px;
+      background-color: rgba(255,255,255,0.95);
+      margin: 20px auto;
+      width: 90%;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    #quiz-container input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 15px;
+      border-radius: 6px;
+      border: 1.5px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>問題実行画面</h1>
+  <div class="input-area">
+    <input type="text" id="subject-input" placeholder="教科名を入力">
+    <button onclick="startQuiz()">開始</button>
+  </div>
+  <div id="quiz-container" style="display:none;">
+    <h3 id="question-text"></h3>
+    <input type="text" id="answer-input" placeholder="答えを入力">
+    <br />
+    <button onclick="submitAnswer()">解答する</button>
+    <p id="feedback"></p>
+  </div>
+
+  <script>
+    let currentQuiz = [];
+    let currentIndex = 0;
+
+    function startQuiz() {
+      const subject = document.getElementById("subject-input").value.trim();
+      const savedData = localStorage.getItem("quiz_" + subject);
+      if (!savedData) {
+        alert("その教科は存在しません");
+        return;
+      }
+      currentQuiz = JSON.parse(savedData);
+      if (currentQuiz.length === 0) {
+        alert("この教科には問題がありません");
+        return;
+      }
+      currentIndex = 0;
+      document.getElementById("quiz-container").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const questionObj = currentQuiz[currentIndex];
+      document.getElementById("question-text").textContent = `${questionObj.category}：${questionObj.question}`;
+      document.getElementById("answer-input").value = "";
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function submitAnswer() {
+      const userAnswer = document.getElementById("answer-input").value.trim();
+      const correct = currentQuiz[currentIndex].answer;
+      const isCorrect = Array.isArray(correct)
+        ? correct.includes(userAnswer)
+        : userAnswer === correct;
+
+      const feedback = isCorrect ? "正解！" : `不正解！正解は「${Array.isArray(correct) ? correct.join("、") : correct}」`;
+      document.getElementById("feedback").textContent = feedback;
+
+      currentIndex++;
+      if (currentIndex < currentQuiz.length) {
+        setTimeout(showQuestion, 1500);
+      } else {
+        setTimeout(() => {
+          document.getElementById("quiz-container").style.display = "none";
+          alert("すべての問題が終了しました");
+        }, 2000);
+      }
+    }
+  </script>
+</body>
+</html>
